@@ -1,0 +1,64 @@
+{
+  "name": "Стандардна Машина (5 Диспензери)",
+  "systemDelayLower": 150,
+  "systemDelayRaise": 150,
+  "mCommandLatency": 120,
+  "valveOpenCmd": "M11 P3",
+  "valveCloseCmd": "M10 P3",
+  "homeCommand": "G28.1 X2 Y2",
+  "parkCommand": "G1 X1 Y1 F2000",
+  "timeUnit": "ms",
+  "decimalSeparator": ".",
+  "minX": -5,
+  "maxX": 350,
+  "minY": -5,
+  "maxY": 300,
+  "moveClickSpeed": 3000,
+  "dispensers": [
+    {
+      "id": 1,
+      "name": "Боја 1",
+      "color": "#2563eb",
+      "lowerCmd": "M11 P4",
+      "raiseCmd": "M10 P4",
+      "offsetX": -0.30,
+      "offsetY": 34.45
+    },
+    {
+      "id": 2,
+      "name": "Боја 2",
+      "color": "#059669",
+      "lowerCmd": "M11 P5",
+      "raiseCmd": "M10 P5",
+      "offsetX": 39.70,
+      "offsetY": 34.45
+    },
+    {
+      "id": 3,
+      "name": "Боја 3",
+      "color": "#dc2626",
+      "lowerCmd": "M11 P6",
+      "raiseCmd": "M10 P6",
+      "offsetX": 79.70,
+      "offsetY": 34.45
+    },
+    {
+      "id": 4,
+      "name": "Боја 4",
+      "color": "#d97706",
+      "lowerCmd": "M11 P7",
+      "raiseCmd": "M10 P7",
+      "offsetX": 119.70,
+      "offsetY": 34.45
+    },
+    {
+      "id": 5,
+      "name": "Боја 5",
+      "color": "#7c3aed",
+      "lowerCmd": "M11 P8",
+      "raiseCmd": "M10 P8",
+      "offsetX": 159.70,
+      "offsetY": 34.45
+    }
+  ]
+}

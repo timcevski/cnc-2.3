@@ -1,0 +1,944 @@
+<!DOCTYPE html>
+<html lang="mk">
+<head>
+  <meta charset="UTF-8">
+  <title>CNC Dispenser V2.3</title>
+  <link rel="stylesheet" href="css/style.css">
+<script src="/_aistudio-iframe.js?v=29045eb3"></script></head>
+<body>
+  <header class="top-bar">
+    <!-- РЕД 1: ВИСТИНСКО ДЕСКТОП МЕНИ, ПРОЕКТ И ЕКСПОРТ -->
+    <div class="toolbar-row file-row">
+      <div class="tool-group">
+        <nav class="app-menu-bar" id="appMenuBar" aria-label="Главно мени">
+          <!-- Мени: Датотека -->
+          <div class="menu-item-dropdown">
+            <button type="button" class="menu-trigger-btn" id="menuTriggerFile">Датотека</button>
+            <div class="menu-dropdown-content">
+              <button type="button" class="menu-action-item" id="btnMenuNewProject">
+                <span class="menu-item-icon">📄</span>
+                <span class="menu-item-label">Нов Проект</span>
+                <span class="menu-item-shortcut">Ctrl+N</span>
+              </button>
+              <button type="button" class="menu-action-item" id="btnOpenProjectCsv">
+                <span class="menu-item-icon">📂</span>
+                <span class="menu-item-label">Отвори Проект (.csv)...</span>
+                <span class="menu-item-shortcut">Ctrl+O</span>
+              </button>
+              <div class="menu-divider"></div>
+              <button type="button" class="menu-action-item" id="btnOpenTxt">
+                <span class="menu-item-icon">📥</span>
+                <span class="menu-item-label">Вчитај чист TXT...</span>
+              </button>
+              <button type="button" class="menu-action-item" id="btnOpenLegacyCsv">
+                <span class="menu-item-icon">📥</span>
+                <span class="menu-item-label">Вчитај Стар Legacy CSV...</span>
+              </button>
+              <div class="menu-divider"></div>
+              <button type="button" class="menu-action-item" id="btnSaveProjectCsv">
+                <span class="menu-item-icon">💾</span>
+                <span class="menu-item-label">Сними Проект</span>
+                <span class="menu-item-shortcut">Ctrl+S</span>
+              </button>
+              <button type="button" class="menu-action-item menu-danger-item" id="btnCloseProject">
+                <span class="menu-item-icon">✖</span>
+                <span class="menu-item-label">Затвори Проект</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Мени: Уреди -->
+          <div class="menu-item-dropdown">
+            <button type="button" class="menu-trigger-btn" id="menuTriggerEdit">Уреди</button>
+            <div class="menu-dropdown-content">
+              <button type="button" class="menu-action-item" id="btnMenuUndo">
+                <span class="menu-item-icon">↩️</span>
+                <span class="menu-item-label">Врати назад (Undo)</span>
+                <span class="menu-item-shortcut">Ctrl+Z</span>
+              </button>
+              <button type="button" class="menu-action-item" id="btnMenuRedo">
+                <span class="menu-item-icon">↪️</span>
+                <span class="menu-item-label">Повтори (Redo)</span>
+                <span class="menu-item-shortcut">Ctrl+Y</span>
+              </button>
+              <div class="menu-divider"></div>
+              <button type="button" class="menu-action-item" id="btnMenuAddPoint">
+                <span class="menu-item-icon">➕</span>
+                <span class="menu-item-label">Додади нова точка</span>
+              </button>
+              <button type="button" class="menu-action-item menu-danger-item" id="btnMenuDeleteSelected">
+                <span class="menu-item-icon">🗑️</span>
+                <span class="menu-item-label">Избриши селектирани</span>
+                <span class="menu-item-shortcut">Delete</span>
+              </button>
+              <div class="menu-divider"></div>
+              <button type="button" class="menu-action-item" id="btnMenuMoveUp">
+                <span class="menu-item-icon">▲</span>
+                <span class="menu-item-label">Помести селектирани нагоре</span>
+              </button>
+              <button type="button" class="menu-action-item" id="btnMenuMoveDown">
+                <span class="menu-item-icon">▼</span>
+                <span class="menu-item-label">Помести селектирани надолу</span>
+              </button>
+              <div class="menu-divider"></div>
+              <button type="button" class="menu-action-item" id="btnMenuPresetLine">
+                <span class="menu-item-icon">📏</span>
+                <span class="menu-item-label">Постави непрекината линија</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Мени: Селекција -->
+          <div class="menu-item-dropdown">
+            <button type="button" class="menu-trigger-btn" id="menuTriggerSelection">Селекција</button>
+            <div class="menu-dropdown-content">
+              <button type="button" class="menu-action-item" id="btnSelectAll">
+                <span class="menu-item-icon">✅</span>
+                <span class="menu-item-label">Селектирај сè</span>
+                <span class="menu-item-shortcut">Ctrl+A</span>
+              </button>
+              <button type="button" class="menu-action-item" id="btnDeselectAll">
+                <span class="menu-item-icon">✖</span>
+                <span class="menu-item-label">Деселектирај сè</span>
+                <span class="menu-item-shortcut">Esc</span>
+              </button>
+              <button type="button" class="menu-action-item" id="btnInvertSelect">
+                <span class="menu-item-icon">🔄</span>
+                <span class="menu-item-label">Инверзија на селекција</span>
+              </button>
+              <div class="menu-divider"></div>
+              <button type="button" class="menu-action-item" id="btnSelectIntermediate">
+                <span class="menu-item-icon">⚡</span>
+                <span class="menu-item-label">Селектирај само меѓуточки (брзина)</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Мени: Алатки -->
+          <div class="menu-item-dropdown">
+            <button type="button" class="menu-trigger-btn" id="menuTriggerTools">Алатки</button>
+            <div class="menu-dropdown-content">
+              <button type="button" class="menu-action-item" id="btnOpenSvgGenTop">
+                <span class="menu-item-icon">⚡</span>
+                <span class="menu-item-label">Генерирај патека од SVG...</span>
+              </button>
+              <button type="button" class="menu-action-item" id="btnExportForAi">
+                <span class="menu-item-icon">📋</span>
+                <span class="menu-item-label">Ископирај координати за AI чат</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Мени: Поставки -->
+          <div class="menu-item-dropdown">
+            <button type="button" class="menu-trigger-btn" id="btnOpenSettings" title="Конфигурација на машината и диспензерите">Поставки</button>
+          </div>
+        </nav>
+
+        <span class="sep">|</span>
+
+        <!-- Име на проектот и статус -->
+        <div id="projectInfoBadge" class="project-info-badge" title="Кликнете за да го преименувате проектот">
+          <span class="proj-icon">📁</span>
+          <span id="projectNameDisplay" class="proj-name">Нов проект.csv</span>
+          <span id="projectSaveStatus" class="proj-status saved">✔ Зачувано</span>
+        </div>
+
+        <input type="file" id="fileInput" style="display:none;">
+      </div>
+
+      <div class="tool-group">
+        <button id="btnExportGcode" class="btn btn-sm btn-success">⚡ Експорт G-Код (.tap)</button>
+        <div id="cycleTimeBox" class="cycle-box" title="Кликнете за детална статистика">
+          <span id="cycleTimeDisplay" class="cycle-main">Време: ~0с</span>
+          <span id="cycleSubDisplay" class="cycle-sub">Патека: 0m</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- РЕД 2: МАСОВНИ ПРОМЕНИ И ФИЛТРИ -->
+    <div class="toolbar-row batch-row">
+      <div class="tool-group batch-group-inner">
+        <span class="group-label batch-label">Масовно:</span>
+
+        <div class="batch-subgroup">
+          <label>Боја:</label>
+          <select id="batchColor" class="inp inp-sm"></select>
+        </div>
+
+        <div class="batch-subgroup">
+          <label>F:</label>
+          <input type="number" id="batchSpeed" class="inp inp-sm" style="width:60px;" placeholder="Брзина">
+          <button id="btnSpeedMinus5" class="btn btn-xs btn-step">-5%</button>
+          <button id="btnSpeedPlus5" class="btn btn-xs btn-step">+5%</button>
+        </div>
+        
+        <div class="batch-subgroup">
+          <label>Време:</label>
+          <input type="number" id="batchTime" class="inp inp-sm" style="width:52px;" placeholder="ms">
+          <button id="btnTimeMinus5" class="btn btn-xs btn-step">-5%</button>
+          <button id="btnTimePlus5" class="btn btn-xs btn-step">+5%</button>
+        </div>
+
+        <div class="batch-subgroup">
+          <label>ΔX:</label>
+          <input type="number" id="batchOffsetX" class="inp inp-sm" style="width:52px;" step="0.05" value="0">
+          <label>ΔY:</label>
+          <input type="number" id="batchOffsetY" class="inp inp-sm" style="width:52px;" step="0.05" value="0">
+        </div>
+
+        <div class="batch-subgroup">
+          <label>Гр.1:</label>
+          <input type="text" id="batchGroup1" class="inp inp-sm" style="width:42px;">
+          <label>Гр.2:</label>
+          <input type="text" id="batchGroup2" class="inp inp-sm" style="width:42px;">
+        </div>
+
+        <button id="btnApplyBatchValues" class="btn btn-sm btn-warning font-semibold">✔ Примени</button>
+
+        <span class="sep">|</span>
+
+        <div class="batch-subgroup batch-filter-subgroup">
+          <label class="batch-filter-lbl">Филтер Боја:</label>
+          <select id="selByColor" class="inp inp-sm"><option value="">-- Сите --</option></select>
+        </div>
+
+        <div class="batch-subgroup batch-filter-subgroup">
+          <label class="batch-filter-lbl">Група:</label>
+          <select id="selByGroup" class="inp inp-sm"><option value="">-- Нема --</option></select>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ЛЕНТА СО ТАБОВИ ЗА НЕЗАВИСНИ ПРОЕКТИ -->
+  <nav id="tabBar" class="tab-bar" aria-label="Отворени проекти">
+    <div id="tabsList" class="tabs-list"></div>
+    <button id="btnNewTab" class="btn btn-xs tab-new-btn" type="button" title="Отвори нов празен проект во нов таб">➕ Нов таб</button>
+  </nav>
+
+  <main class="main-container">
+    <!-- ЛЕВА КОЛОНА: ТАБЕЛА ГОРЕ + МАШИНСКИ ПАНЕЛ ДОЛУ -->
+    <div id="leftColumn" class="left-column">
+
+      <section id="tablePanel" class="table-panel">
+        <div class="table-actions">
+          <button id="btnAddPoint" class="btn btn-xs btn-primary">➕ Додади точка</button>
+          <button id="btnPresetLine" class="btn btn-xs" style="background:#eff6ff;border-color:#93c5fd;color:#1d4ed8;font-weight:600;" title="Постави непрекината линија за селектирани последователни точки од иста боја">📏 Линија</button>
+          <button id="btnSelectPassPoints" class="btn btn-xs" style="background:#f0fdf4;border-color:#86efac;color:#166534;font-weight:600;" title="Брзо селектирај ги меѓуточките во линија (точките што не влијаат на диспензерот и дизната) за брза корекција на брзина">⚡ Меѓуточки</button>
+          <button id="btnMoveUp" class="btn btn-xs">▲ Нагоре</button>
+          <button id="btnMoveDown" class="btn btn-xs">▼ Надолу</button>
+          <button id="btnDeleteSelected" class="btn btn-xs btn-danger">🗑️ Избриши</button>
+          <button id="btnUndo" class="btn btn-xs">Undo (Ctrl+Z)</button>
+          <button id="btnRedo" class="btn btn-xs">Redo (Ctrl+Y)</button>
+          <span id="selectedCount" class="badge">Селектирани: 0</span>
+        </div>
+        <div class="table-scroll">
+          <table id="pointsTable">
+            <thead>
+              <tr>
+                <th title="Повлечи за прередување">↕</th>
+                <th data-field="active" title="Десен клик за групно чекирање/одчекирање">Акт</th>
+                <th>Р.бр</th>
+                <th>X</th>
+                <th>Y</th>
+                <th data-field="speed" title="Кликни за групно менување брзина на селектираните точки" style="cursor:pointer;color:#1d4ed8;">Брзина ⚡</th>
+                <th data-field="lower" title="Десен клик за групно чекирање/одчекирање">Доле</th>
+                <th data-field="valveStart" title="Десен клик за групно чекирање/одчекирање">Боја ст.</th>
+                <th>Време</th>
+                <th data-field="valveStop" title="Десен клик за групно чекирање/одчекирање">Боја стп.</th>
+                <th data-field="raise" title="Десен клик за групно чекирање/одчекирање">Горе</th>
+                <th>Боја</th>
+                <th>Група 1</th>
+                <th>Група 2</th>
+              </tr>
+            </thead>
+            <tbody id="tableBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <div id="leftPaneSplitter" class="pane-splitter" title="Повлечете нагоре/надолу за промена на висината меѓу табелата и панелот за машина">
+        <span class="splitter-grip">⋯</span>
+      </div>
+
+      <!-- ДОЛУ ЛЕВО: ВГРАДЕН ПАНЕЛ ЗА КОНТРОЛА НА МАШИНА (НЕЗАВИСЕН ОД ТАБОВИ) -->
+      <section id="machinePanel" class="machine-panel">
+        <div class="machine-header">
+          <div class="machine-header-left">
+            <span class="machine-title">🎛️ Машина</span>
+            <select id="machineDriverSelect" class="inp inp-sm machine-select" title="Избор на комуникациски драјвер">
+              <option value="simulator">🧪 Симулатор (Тест)</option>
+              <option value="mach3">🔌 Mach3 Bridge (127.0.0.1:8765)</option>
+            </select>
+            <button id="btnMachineConnect" class="btn btn-xs btn-primary" type="button">🔌 Поврзи</button>
+            <span id="machineStatusBadge" class="machine-badge status-disconnected">НЕПОВРЗАНА</span>
+            <span id="machineJobSummary" class="machine-job-summary" style="display:none;"></span>
+          </div>
+          <div class="machine-header-right">
+            <button id="btnToggleOperatorMode" class="btn btn-xs btn-operator-mode" type="button" title="Префрли во Операторски режим со голем DRO и touch копчиња (F8 / Ctrl+O)" style="margin-right: 6px;">🖥️ Операторски мод</button>
+            <button id="btnToggleMachinePanel" class="btn btn-xs" type="button" title="Собери го панелот за повеќе простор на табелата">▾ Собери</button>
+          </div>
+        </div>
+
+        <div id="machinePanelBody" class="machine-body">
+          <div id="machineSafetyBanner" class="machine-banner banner-warn" style="display:none;">
+            <span id="machineSafetyText" class="machine-banner-text"></span>
+            <button id="btnJumpToRunningTab" class="btn btn-xs" type="button" style="display:none;">👁 Прикажи таб</button>
+          </div>
+
+          <div class="machine-grid">
+            <!-- ЛЕВ ДЕЛ: ПРОГРАМА И БЕЗБЕДНОСТ -->
+            <div class="machine-card">
+              <div class="machine-card-title">Извршување програма</div>
+              <div class="machine-run-row">
+                <button id="btnMachineRun" class="btn btn-sm btn-success machine-btn-run" type="button">▶ Пушти активен таб</button>
+              </div>
+              <div class="machine-ctrl-row">
+                <button id="btnMachinePause" class="btn btn-xs btn-warning" type="button">⏸ Пауза</button>
+                <button id="btnMachineStop" class="btn btn-xs btn-danger" type="button">⏹ СТОП</button>
+                <button id="btnMachineReset" class="btn btn-xs machine-reset-btn" type="button" title="Mach3 RESET (OEM 1021) — вклучува или чисти E-Stop/Reset и ги крева диспензерите">🔄 RESET</button>
+              </div>
+              <div class="machine-run-row" style="margin-top: 4px;">
+                <button id="btnMachineRunFromHere" class="btn btn-xs btn-primary machine-btn-run" type="button" title="Безбедно започни извршување од моментално селектираниот ред во табелата со репозиционирање на N-1">📍 Почни од тука (селектиран ред)</button>
+              </div>
+              <!-- MDI РЕД ЗА 1 РЕД G-КОД КОН MACH3 -->
+              <div class="machine-mdi-row">
+                <input type="text" id="machineMdiInput" class="inp machine-mdi-input" placeholder="MDI пр. G0 X30 Y25 F1500" title="Внесете 1 ред G-код (пр. G0 X30 Y25 F1500 или M11 P3). Enter или копче ПРАТИ НА MACH3. Стрелки ↑↓ за историја.">
+                <button id="btnMachineMdiSend" class="btn btn-xs btn-primary machine-mdi-btn" type="button" title="Испрати ја командата директно до Mach3">📤 ПРАТИ НА MACH3</button>
+              </div>
+              <div id="machineMdiFeedback" class="machine-mdi-feedback">
+                <span id="machineMdiStatus">MDI подготвен</span>
+                <span style="color:#94a3b8;">↑↓ историја</span>
+              </div>
+              <div class="machine-progress-wrap">
+                <div class="machine-progress-track">
+                  <div id="machineProgressFill" class="machine-progress-fill" style="width:0%;"></div>
+                </div>
+                <span id="machineProgressText" class="machine-progress-text">Подготвено</span>
+              </div>
+              <label class="machine-lock-check" title="Доколку е штиклирано, менувањето табови се заклучува додека машината работи (Строг производствен режим)">
+                <input type="checkbox" id="chkStrictTabLock">
+                <span>🔒 Строг режим (заклучи табови при работа)</span>
+              </label>
+            </div>
+
+            <!-- ДЕСЕН ДЕЛ: 2D DRO КООРДИНАТИ, TEACH, JOG, ДИСПЕНЗЕРИ И БРЗИ КОМАНДИ -->
+            <div class="machine-card machine-card-right">
+              <div class="dro-panel">
+                <div class="dro-coords">
+                  <span class="dro-axis"><em>X</em><strong id="droX">0.000</strong></span>
+                  <span class="dro-axis"><em>Y</em><strong id="droY">0.000</strong></span>
+                  <span id="droIOState" class="dro-io">Исклучено</span>
+                </div>
+                <div class="dro-zero-row">
+                  <button id="btnZeroX" class="btn btn-xs dro-zero-btn" type="button">Zero X</button>
+                  <button id="btnZeroY" class="btn btn-xs dro-zero-btn" type="button">Zero Y</button>
+                  <button id="btnZeroAll" class="btn btn-xs dro-zero-btn" type="button">Zero XY</button>
+                </div>
+              </div>
+
+              <div class="teach-row">
+                <span class="machine-mini-lbl">Дисп.:</span>
+                <select id="machineActiveDispenser" class="inp inp-sm machine-disp-select"></select>
+                <button id="btnMachineTeach" class="btn btn-xs btn-outline machine-btn-teach" type="button" title="Преземи тековна координата од машината минус офсетот на избраниот диспензер и додај точка во табелата">📍 Преземи точка</button>
+              </div>
+
+              <div class="jog-test-row">
+                <div id="machineJogBox" class="jog-box">
+                  <div class="jog-header">
+                    <span class="machine-mini-lbl">Jog:</span>
+                    <select id="jogStepSelect" class="inp inp-sm jog-step-select">
+                      <option value="0.05">0.05mm</option>
+                      <option value="0.1">0.1mm</option>
+                      <option value="0.5">0.5mm</option>
+                      <option value="1" selected>1mm</option>
+                      <option value="5">5mm</option>
+                      <option value="10">10mm</option>
+                    </select>
+                  </div>
+                  <div class="jog-grid">
+                    <div class="jog-grid-row">
+                      <span class="jog-spacer"></span>
+                      <button class="btn btn-xs jog-btn" type="button" data-jog-axis="Y" data-jog-dir="1">Y+</button>
+                      <span class="jog-spacer"></span>
+                    </div>
+                    <div class="jog-grid-row">
+                      <button class="btn btn-xs jog-btn" type="button" data-jog-axis="X" data-jog-dir="-1">X-</button>
+                      <button class="btn btn-xs jog-btn" type="button" data-jog-axis="Y" data-jog-dir="-1">Y-</button>
+                      <button class="btn btn-xs jog-btn" type="button" data-jog-axis="X" data-jog-dir="1">X+</button>
+                    </div>
+                  </div>
+                  <div class="kbd-switch-row" title="Изберете дали стрелките на тастатурата ги поместуваат селектираните точки во графикот или ја придвижуваат машината">
+                    <span class="kbd-switch-lbl">⌨️:</span>
+                    <button id="btnKbdModePoints" class="btn btn-xs kbd-mode-btn active-points" type="button">📌 Точки</button>
+                    <button id="btnKbdModeMachine" class="btn btn-xs kbd-mode-btn" type="button">🕹️ Машина</button>
+                  </div>
+                </div>
+
+                <div class="mdi-box">
+                  <div class="disp-header-row">
+                    <span class="machine-mini-lbl">Диспензери: <span id="dispActiveBadge" class="disp-status-pill">—</span></span>
+                    <button id="btnRaiseAllDispensers" class="btn raise-all-btn" type="button" title="Безбедно подигни ги сите диспензери горе и затвори вентил">⬆ Сите горе</button>
+                  </div>
+                  <div id="machineDispButtons" class="disp-btns-row"></div>
+                  <div class="valve-row">
+                    <button id="btnMachineValve" class="btn valve-btn" type="button">💧 Вентил: ЗАТВОРЕН</button>
+                    <button id="btnMachinePulse100" class="btn pulse-btn" type="button" title="Отвори вентил на 100ms и веднаш затвори">⚡ 100ms</button>
+                  </div>
+                  <div class="quick-cmd-row">
+                    <button id="btnCmdHomeRef" class="btn quick-cmd-btn" type="button" title="Безбедно хомирање: прво мора сите диспензери да се подигнати">🏠 G28.1 (Хомирање)</button>
+                    <button id="btnCmdParkPos" class="btn quick-cmd-btn" type="button" title="Оди на позиција X1 Y1 (F2000): прво мора сите диспензери да се подигнати">🎯 G1 X1 Y1 (Паркирај)</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- ДЕСНО: 2D ГРАФИК -->
+    <section class="canvas-panel">
+      <div class="canvas-bar">
+        <!-- Ред 1: Контроли за цртање, оди на клик, центрирање, SVG подлога и координати -->
+        <div class="canvas-row">
+          <div class="canvas-tools">
+            <button id="btnToggleAddMode" class="btn btn-addmode-off">➕ Точка: ИСКЛ</button>
+            <button id="btnToggleMoveToClick" class="btn btn-moveclick-off" type="button" title="Кога е ВКЛ, клик на графикот го носи избраниот диспензер до таа точка (само кога сите диспензери се кренати)">🎯 Оди на клик: ИСКЛ</button>
+            <button id="btnResetView" class="btn btn-view-reset">🎯 Центрирај</button>
+            <span class="sep">|</span>
+            <button id="btnLoadSvg" class="btn btn-svg-load">📁 Вчитај SVG</button>
+            <button id="btnToggleSvg" class="btn btn-svg-toggle" style="display:inline-flex;align-items:center;" title="Вклучи/Исклучи приказ на референтната SVG подлога на графикот">🖼️ SVG: ВКЛ</button>
+            <button id="btnClearSvg" class="btn btn-svg-clear">🗑️ Отстрани</button>
+          </div>
+          <div class="coord-box">
+            <span id="coordDisplay" class="coord-label">X: 0.000, Y: 0.000</span>
+          </div>
+        </div>
+
+        <!-- Ред 2: Безбедносен клиренс, калибрација и филтри за бои/диспензери -->
+        <div class="canvas-row canvas-subrow">
+          <div class="canvas-tools">
+            <button id="btnOpenCalibration" class="btn btn-calibration" type="button" title="Отвори прозорец за калибрација на дизни и офсети над табелата (графикот останува отворен)">🎯 Калибрација</button>
+            <span class="sep">|</span>
+            <button id="btnToggleClearance" class="btn btn-clearance-toggle" title="Вклучи/Исклучи приказ на безбедносен клиренс (круг до ѕид) за автоматски пресметаните точки">⭕ Клиренс: ВКЛ</button>
+            <span class="sep">|</span>
+            <span class="disp-filter-lbl">Бои:</span>
+            <div id="dispenserFilterButtons" class="disp-filter-wrap"></div>
+          </div>
+        </div>
+      </div>
+      <div class="canvas-wrapper" id="canvasWrapper">
+        <canvas id="mainCanvas"></canvas>
+      </div>
+    </section>
+  </main>
+
+  <!-- ЛЕБДЕЧКИ ПРОЗОРЕЦ ЗА КАЛИБРАЦИЈА (НАД ТАБЕЛАТА, БЕЗ ЗАТВОРАЊЕ НА ГРАФИКОТ) -->
+  <div id="calibrationSidePanel" class="calib-floating-window" style="display:none;">
+    <div id="calibDragHeader" class="calib-win-header" title="Можете да го повлечете прозорецот за калибрација">
+      <div class="calib-win-title">
+        <span>🎯</span>
+        <h3>Калибрација на дизни и офсети</h3>
+        <span id="calibPointsCountBadge" class="calib-count-badge">0 точки</span>
+      </div>
+      <button id="btnCalibCloseHeader" type="button" class="btn btn-xs btn-danger" title="Откажи и затвори">✖</button>
+    </div>
+
+    <div class="calib-win-body">
+      <div class="calib-section-row">
+        <div id="calibDispenserBtnGroup" class="calib-disp-btn-group"></div>
+      </div>
+
+      <div class="calib-section-row calib-stats-bar">
+        <span id="calibCurOffsetDisplay" class="calib-badge calib-badge-neutral" title="Моментален машински офсет">Офсет: X=0.000, Y=0.000</span>
+        <span id="calibLiveShiftVal" class="calib-badge calib-badge-neutral" title="Моментално поместување во живо">ΔX: 0.000 | ΔY: 0.000</span>
+        <button id="btnCalibResetShift" type="button" class="btn btn-xs calib-reset-btn" title="Ресетирај го тековното поместување назад на 0">↺ Ресет</button>
+      </div>
+
+      <div class="calib-section-row">
+        <label class="calib-field-label" for="calibModeSelect">Режим:</label>
+        <select id="calibModeSelect" class="inp inp-sm calib-mode-select" title="Изберете режим на калибрација">
+          <option value="nozzle_shift_natural">1. Дизната бега на машина (➡️ Стрелка = дизна десно)</option>
+          <option value="nozzle_shift_inverse">1. Дизната бега на машина (🎯 Стрелка = капката паднала таму)</option>
+          <option value="old_project">2. Стар проект (Компензирај офсет за машината да остане на исто место)</option>
+        </select>
+      </div>
+
+      <div class="calib-section-row calib-nudge-row">
+        <span class="calib-field-label">Микро-поместување (или влечете на графикот):</span>
+        <div class="calib-nudge-controls">
+          <div class="calib-arrows">
+            <button id="btnCalibNudgeLeft" type="button" class="calib-nudge-btn" title="Помести налево (◀)">◀</button>
+            <button id="btnCalibNudgeUp" type="button" class="calib-nudge-btn" title="Помести нагоре (▲)">▲</button>
+            <button id="btnCalibNudgeDown" type="button" class="calib-nudge-btn" title="Помести надолу (▼)">▼</button>
+            <button id="btnCalibNudgeRight" type="button" class="calib-nudge-btn" title="Помести надесно (▶)">▶</button>
+          </div>
+          <select id="calibStepSelect" class="inp inp-sm calib-step-select" title="Чекор на поместување">
+            <option value="0.01">0.01mm</option>
+            <option value="0.05" selected>0.05mm</option>
+            <option value="0.10">0.10mm</option>
+            <option value="0.50">0.50mm</option>
+            <option value="1.00">1.00mm</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="calib-win-footer">
+      <button id="btnCalibCancel" type="button" class="btn btn-sm btn-calib-cancel" title="Откажи незачувано и затвори">✖ Затвори</button>
+      <div class="calib-footer-right">
+        <button id="btnCalibApplyNext" type="button" class="btn btn-sm btn-calib-next" title="Сними го тековниот диспензер и веднаш продолжи на следниот без затворање">💾 Сними и Следен ➡️</button>
+        <button id="btnCalibApply" type="button" class="btn btn-sm btn-calib-save" title="Сними го новиот офсет (ОК) и заврши">✔ Сними (ОК)</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- МОДАЛ ЗА ПОСТАВКИ (ПРОШИРЕН ЗА ПРЕГЛЕДНОСТ) -->
+  <div id="settingsModal" class="modal-overlay" style="display:none;">
+    <div class="modal-dialog settings-modal-dialog">
+      <div class="modal-header">
+        <h3>⚙️ Конфигурација на машина и калибрација</h3>
+        <button id="btnCloseSettings" class="btn btn-xs btn-danger">✖</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-row">
+          <div class="form-col">
+            <label>Хедер (Почетен G-Код):</label>
+            <textarea id="modalHeaderCode" class="inp" rows="2" placeholder="G90..."></textarea>
+          </div>
+          <div class="form-col">
+            <label>Футер (Завршен G-Код):</label>
+            <textarea id="modalFooterCode" class="inp" rows="2"></textarea>
+          </div>
+        </div>
+
+        <div class="settings-preset-box">
+          <div class="settings-preset-head">
+            <strong style="font-size:11.5px; color:#0f172a;">⚡ Брзи пресети за Mach3 логика:</strong>
+            <div class="settings-preset-btns">
+              <button id="btnPresetM10M11" type="button" class="btn btn-xs" style="background:#ecfdf5; border-color:#6ee7b7; color:#065f46; font-weight:700;" title="Постави M11/M10 команди според пиновите на машината: Вентил P3, Диспензери P4–P8">⚡ Брз режим (M10/M11 P3–P8)</button>
+              <button id="btnPresetMacros" type="button" class="btn btn-xs" style="background:#eff6ff; border-color:#93c5fd; color:#1e40af; font-weight:700;" title="Постави макро команди: M103/M203 вентил, M104-M108/M204-M208 диспензери">📜 Режим со макроа (M103/M203)</button>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-col">
+              <label>Вентил отвори (M-команда):</label>
+              <input type="text" id="modalValveOpenCmd" class="inp" value="M11 P3" placeholder="M11 P3 или M103" title="Команда за отворање на вентилот">
+            </div>
+            <div class="form-col">
+              <label>Вентил затвори (M-команда):</label>
+              <input type="text" id="modalValveCloseCmd" class="inp" value="M10 P3" placeholder="M10 P3 или M203" title="Команда за затворање на вентилот">
+            </div>
+            <div class="form-col">
+              <label>Команда за Хомирање:</label>
+              <input type="text" id="modalHomeCmd" class="inp" value="G28.1 X2 Y2" placeholder="G28.1 X2 Y2" title="Команда за референцирање / хомирање">
+            </div>
+            <div class="form-col">
+              <label>Команда за Паркирање:</label>
+              <input type="text" id="modalParkCmd" class="inp" value="G1 X1 Y1 F2000" placeholder="G1 X1 Y1 F2000" title="Команда за одење во паркинг позиција">
+            </div>
+          </div>
+        </div>
+
+        <div class="form-row mt-2">
+          <div class="form-col">
+            <label>Единица за G4 време во G-код:</label>
+            <select id="modalTimeUnit" class="inp">
+              <option value="ms">Милисекунди (ms) -> G4 P150 (Цел број)</option>
+              <option value="s">Секунди (s) -> G4 P0.150 (Конверзија)</option>
+            </select>
+          </div>
+          <div class="form-col">
+            <label>Децимален сепаратор за X/Y:</label>
+            <select id="modalDecimalSeparator" class="inp">
+              <option value=".">Точка (.) - Стандард ISO</option>
+              <option value=",">Запирка (,) - Европски CNC</option>
+            </select>
+          </div>
+          <div class="form-col">
+            <label>M-Латенција за пресметка (ms):</label>
+            <input type="number" id="modalMLatency" class="inp" value="120" title="Време за обработка на секоја M-команда од CNC контролерот">
+          </div>
+        </div>
+
+        <div class="form-row mt-2">
+          <div class="form-col">
+            <label>Пауза спуштање (ms):</label>
+            <input type="number" id="modalDelayLower" class="inp" value="150">
+          </div>
+          <div class="form-col">
+            <label>Пауза кревање (ms):</label>
+            <input type="number" id="modalDelayRaise" class="inp" value="150">
+          </div>
+          <div class="form-col">
+            <label>Чекор стрелки (mm):</label>
+            <input type="number" id="modalStepIncrement" class="inp" step="0.01" value="0.05">
+          </div>
+        </div>
+
+        <div class="form-row mt-2">
+          <div class="form-col">
+            <label>Мин X лимит (mm):</label>
+            <input type="number" id="modalMinX" class="inp" step="1" value="-5" title="Долна машинска граница X (стандардно -5mm заради офсетот на Д1)">
+          </div>
+          <div class="form-col">
+            <label>Макс X лимит (mm):</label>
+            <input type="number" id="modalMaxX" class="inp" step="1" value="350" title="Максимален од на машината по X (mm)">
+          </div>
+          <div class="form-col">
+            <label>Мин Y лимит (mm):</label>
+            <input type="number" id="modalMinY" class="inp" step="1" value="-5" title="Долна машинска граница Y (стандардно -5mm)">
+          </div>
+          <div class="form-col">
+            <label>Макс Y лимит (mm):</label>
+            <input type="number" id="modalMaxY" class="inp" step="1" value="300" title="Максимален од на машината по Y (mm)">
+          </div>
+          <div class="form-col">
+            <label>Брзина Оди на клик (F):</label>
+            <input type="number" id="modalMoveClickSpeed" class="inp" step="100" value="3000" title="Брзина на движење при клик на 2D графикот (mm/min)">
+          </div>
+        </div>
+
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:14px;">
+          <h4 style="margin:0;">Конфигурација на Диспензери и Офсети (+ кон машинска нула):</h4>
+          <button id="btnAddDispenser" class="btn btn-xs btn-primary">➕ Додади диспензер</button>
+        </div>
+        
+        <div class="dispensers-scroll" style="margin-top:6px;">
+          <table class="settings-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Име</th>
+                <th>Боја</th>
+                <th>Спушти (M)</th>
+                <th>Крени (M)</th>
+                <th>Offset X</th>
+                <th>Offset Y</th>
+                <th>Бриши</th>
+              </tr>
+            </thead>
+            <tbody id="dispensersTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id="btnResetCalibratedDispensers" class="btn btn-sm" style="background:#fef3c7;color:#92400e;border-color:#f59e0b;font-weight:600;" title="Постави ги точно калибрираните фабрички вредности од default_machine.json">⚡ Фабрички калибрирани офсети &amp; Футер</button>
+        <div class="settings-footer-actions">
+          <button id="btnExportMachineProfile" class="btn btn-sm">Зачувај профил (.json)</button>
+          <button id="btnImportMachineProfile" class="btn btn-sm">Вчитај профил (.json)</button>
+          <input type="file" id="machineProfileInput" style="display:none;" accept=".json">
+          <button id="btnSaveSettings" class="btn btn-sm btn-primary">Зачувај и Затвори</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- МОДАЛ ЗА АВТОМАТСКА ПАТЕКА ОД SVG -->
+  <div id="svgGeneratorModal" class="modal-overlay" style="display:none;">
+    <div class="modal-dialog" style="width: 880px; max-width: 95vw;">
+      <div class="modal-header" style="background:#faf5ff;border-bottom:1px solid #e9d5ff;">
+        <div class="svg-modal-title-wrap">
+          <span style="font-size:18px;margin-right:8px;">⚡</span>
+          <div>
+            <h3 style="margin:0;color:#6b21a8;font-size:14px;">Автоматски генератор на CNC патека од SVG</h3>
+            <p style="margin:0;font-size:11px;color:#7e22ce;">Вчитајте векторска графика (SVG) и креирајте подготвена CNC програма за диспензерите со 1 клик</p>
+          </div>
+        </div>
+        <button id="btnCloseSvgGen" class="btn btn-xs btn-danger">✖</button>
+      </div>
+
+      <div class="modal-body svg-modal-body">
+        <div style="background:#f8fafc;padding:8px 10px;border-radius:6px;border:1px solid #e2e8f0;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+            <strong style="color:#1e293b;font-size:11.5px;">Извор на SVG слика:</strong>
+            <div class="svg-btn-strip">
+              <button id="btnSvgGenLoadFile" class="btn btn-xs btn-primary">📁 Отвори мој SVG</button>
+              <button id="btnSvgGenUseCurrent" class="btn btn-xs btn-outline">🖼️ Користи веќе вчитан SVG</button>
+              <input type="file" id="svgGenFileInput" accept=".svg" style="display:none;">
+            </div>
+          </div>
+          <div class="svg-sample-strip">
+            <span style="font-size:11px;color:#64748b;">Брзи тест примероци:</span>
+            <button id="btnSvgSampleChannels" class="btn btn-xs" style="background:#e0e7ff;color:#4338ca;border-color:#c7d2fe;font-weight:600;">📐 Канали и езерца</button>
+            <button id="btnSvgSampleStar" class="btn btn-xs" style="background:#eff6ff;color:#1d4ed8;border-color:#bfdbfe;">⭐ Ѕвезда</button>
+            <button id="btnSvgSampleFlower" class="btn btn-xs" style="background:#ecfdf5;color:#047857;border-color:#a7f3d0;">🌸 Цвет (3 бои)</button>
+            <button id="btnSvgGenPasteCode" class="btn btn-xs">📋 Пастирај SVG код</button>
+          </div>
+        </div>
+
+        <div class="svg-columns">
+          <div class="svg-col-left">
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <span style="font-weight:600;color:#334155;font-size:11px;">Преглед на SVG:</span>
+              <span id="svgGenStats" style="font-size:10.5px;color:#64748b;">Детектирање...</span>
+            </div>
+            <div id="svgGenPreviewSvg" style="width:100%;height:180px;background:#ffffff;border:1px dashed #cbd5e1;border-radius:6px;display:flex;align-items:center;justify-content:center;overflow:hidden;padding:8px;">
+            </div>
+
+            <div style="background:#f1f5f9;padding:8px;border-radius:6px;border:1px solid #e2e8f0;margin-top:2px;">
+              <div style="font-weight:600;font-size:11px;color:#1e3a8a;margin-bottom:4px;">
+                🎨 Автоматско мапирање на бои кон Диспензери:
+              </div>
+              <div id="svgGenColorList" style="max-height:85px;overflow-y:auto;display:flex;flex-direction:column;">
+              </div>
+            </div>
+          </div>
+
+          <div class="svg-col-right">
+            <div style="font-weight:700;color:#1e293b;border-bottom:1px solid #f1f5f9;padding-bottom:4px;">
+              ⚙️ Поставки за патеката:
+            </div>
+            <div style="margin-top:6px;padding:7px 9px;border:1px solid #fbbf24;border-radius:5px;background:#fffbeb;color:#92400e;font-size:10.5px;">
+              ⚠️ Волуметриското дозирање е експериментално. Q = 16.5 mm³/s е привремена, некалибрирана вредност; проверете ги резултатите пред работа на машината.
+            </div>
+
+            <div class="form-row">
+              <div class="form-col">
+                <label style="font-weight:600;">Режим на дозирање:</label>
+                <div class="svg-mode-box">
+                  <label class="svg-radio-primary">
+                    <input type="radio" name="svgGenMode" value="pockets" checked>
+                    <span>🎯 Тежишта на полиња и канали (Полнење)</span>
+                  </label>
+                  <span style="font-size:10px;color:#166534;font-weight:600;margin-left:22px;margin-bottom:2px;">
+                    ⭐ Наоѓа најдлабоки точки во езерца и оски на канали подалеку од ѕидовите
+                  </span>
+
+                  <div class="svg-radio-secondary-row">
+                    <label class="svg-radio-sec">
+                      <input type="radio" name="svgGenMode" value="lines">
+                      <span>Линии / Контури</span>
+                    </label>
+                    <label class="svg-radio-sec">
+                      <input type="radio" name="svgGenMode" value="dots">
+                      <span>Капки по контури</span>
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-row mt-2">
+              <div class="form-col">
+                <label>Ширина на шемата (mm):</label>
+                <input type="number" id="svgGenTargetWidth" class="inp" value="60" step="0.1" title="Сакана физичка ширина. Автоматски се чита точната ширина од SVG.">
+              </div>
+              <div class="form-col">
+                <label>Чекор меѓу капки (mm):</label>
+                <select id="svgGenStep" class="inp" title="Базен чекор; алгоритмот го зголемува растојанието во помали полиња, а го задржува во долги континуирани форми.">
+                  <option value="1.5">1.5 mm (Густи капки)</option>
+                  <option value="2.0" selected>2.0 mm (Оптимално за канали ~1mm)</option>
+                  <option value="2.5">2.5 mm (Поретки капки)</option>
+                  <option value="3.0">3.0 mm (Широк чекор)</option>
+                  <option value="1.0">1.0 mm (Многу густо)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-row mt-2">
+              <div class="form-col">
+                <label>Брзина на линија F:</label>
+                <input type="number" id="svgGenSpeed" class="inp" value="650" max="950" title="Максимална работна брзина за дозирање: 950 mm/min.">
+              </div>
+              <div class="form-col">
+                <label>Брзина меѓу езерца F:</label>
+                <input type="number" id="svgGenTravelNearSpeed" class="inp" value="1200" title="Брзина кога диспензерите се горе при премин меѓу блиски езерца (mm/min, стандардно 1200-2000)">
+              </div>
+              <div class="form-col">
+                <label>Брзина долг премин / алат F:</label>
+                <input type="number" id="svgGenTravelFarSpeed" class="inp" value="5000" title="Брзина при далечно движење или промена на диспензер (mm/min, стандардно 5000)">
+              </div>
+            </div>
+
+            <div class="form-row mt-2">
+              <div class="form-col">
+                <label>Време капка / пауза (ms):</label>
+                <input type="number" id="svgGenDropTime" class="inp" value="50" title="Време за задршка на секоја единечна капка или капиларна точка (ms, стандардно 50-100)">
+              </div>
+              <div class="form-col">
+                <label>Мин. од ѕид (mm):</label>
+                <input type="number" id="svgGenMinClearance" class="inp" value="0.18" step="0.02" title="Безбедно растојание од ѕидовите на езерцата (за тенки канали ~0.5-1mm ставете 0.15 - 0.20mm)">
+              </div>
+              <div class="form-col">
+                <label>Оддалеченост од врв (mm):</label>
+                <input type="number" id="svgGenTipMargin" class="inp" value="0.8" step="0.1" title="Спречува ставање капки на самите крајни врвови/ќошиња на каналите и ги центрира кон средината">
+              </div>
+            </div>
+
+            <div class="form-row mt-2">
+              <div class="form-col">
+                <label>Длабочина на езерца (mm):</label>
+                <input type="number" id="svgGenDepth" class="inp" value="1.0" step="0.1" title="Длабочина на калапот/гравурата во mm (стандардно 1.0mm)">
+              </div>
+              <div class="form-col">
+                <label>Дебит / Проток Q (mm³/s):</label>
+                <input type="number" id="svgGenFlowRate" class="inp" value="16.5" step="0.5" title="Привремена, некалибрирана вредност. Заменете ја со измерен проток Q (mm³/s).">
+              </div>
+              <div class="form-col" style="display:flex;align-items:flex-end;">
+                <label class="svg-inline-check" title="Тесните полиња и тесните локални премини добиваат одделни циклуси со волуметриски пресметано време">
+                  <input type="checkbox" id="svgGenCapillary" checked>
+                  <strong>Капиларност за тесни канали</strong>
+                </label>
+              </div>
+            </div>
+
+            <div class="form-row mt-2">
+              <div class="form-col">
+                <label>Акутен шпиц задршка (ms):</label>
+                <input type="number" id="svgGenAcuteTipDwell" class="inp" value="30" title="Автоматска задршка со отворен вентил на остри шпицови/краци (<73°) за бојата да го исполни врвот пред дизната да сврти">
+              </div>
+              <div class="form-col" style="display:flex;align-items:flex-end;">
+                <label class="svg-inline-check" title="Ramer-Douglas-Peucker алгоритам: ги препознава правите полигонални краци и ги сведува на клучни точки со отклон до 0.08 mm">
+                  <input type="checkbox" id="svgGenRdpSimplify" checked>
+                  <strong>Полигонална RDP редукција</strong>
+                </label>
+              </div>
+            </div>
+
+            <div class="form-row mt-2">
+              <div class="form-col">
+                <label>Почетен офсет X (mm):</label>
+                <input type="number" id="svgGenOffsetX" class="inp" value="0" step="0.5">
+              </div>
+              <div class="form-col">
+                <label>Почетен офсет Y (mm):</label>
+                <input type="number" id="svgGenOffsetY" class="inp" value="0" step="0.5">
+              </div>
+            </div>
+
+            <div class="svg-options-box">
+              <label class="svg-opt-check">
+                <input type="checkbox" id="svgGenInvertY" checked>
+                <strong>Инвертирај Y оска (CNC стандард: горе е позитивно)</strong>
+              </label>
+              <label class="svg-opt-check">
+                <input type="checkbox" id="svgGenGroupByColor" checked>
+                <strong>Групирај по диспензер (Боја)</strong>
+              </label>
+              <label class="svg-opt-check" title="Кога е вклучено, малиот клиренс го намалува чекорот и создава повеќе точки.">
+                <input type="checkbox" id="svgGenAdaptiveStep">
+                <strong>Погусти точки при мал клиренс</strong>
+              </label>
+              <label class="svg-opt-check" title="Работната брзина автоматски се пресметува како F = 60×Q / (W×D), ограничена до 950 mm/min.">
+                <input type="checkbox" id="svgGenAutoVolumetricSpeed" checked>
+                <strong>Автоматска волуметриска брзина F = 60×Q/(W×D), макс. 950</strong>
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer" style="background:#f8fafc;border-top:1px solid #e2e8f0;padding:10px 14px;">
+        <button id="btnCancelSvgGen" class="btn btn-sm">✖ Откажи</button>
+        <div class="svg-footer-actions">
+          <button id="btnSvgGenAppend" class="btn btn-sm btn-outline" style="border-color:#7c3aed;color:#6d28d9;font-weight:600;">➕ Додади на крај на табелата</button>
+          <button id="btnSvgGenReplace" class="btn btn-sm btn-primary" style="background:#7c3aed;border-color:#6d28d9;font-weight:700;">🚀 Генерирај патека (Замени табела)</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3-ОПЦИСКИ ДИЈАЛОГ ЗА НЕЗАЧУВАНИ ИЗМЕНИ -->
+  <div id="unsavedModal" class="modal-overlay" style="display:none;z-index:1100;">
+    <div class="modal-dialog unsaved-dialog">
+      <div class="modal-header unsaved-header">
+        <div class="unsaved-header-title">
+          <span class="unsaved-icon">⚠️</span>
+          <h3 id="unsavedModalTitle" style="margin:0;font-size:14px;color:#92400e;">Незачувани измени</h3>
+        </div>
+        <button id="btnCloseUnsavedModal" class="btn btn-xs btn-danger" type="button">✖</button>
+      </div>
+      <div class="modal-body unsaved-body">
+        <p id="unsavedModalMessage" class="unsaved-message"></p>
+      </div>
+      <div class="modal-footer unsaved-footer">
+        <button id="btnUnsavedDiscard" class="btn btn-sm btn-unsaved-discard" type="button">🗑️ Не снимај</button>
+        <div class="unsaved-actions-right">
+          <button id="btnUnsavedCancel" class="btn btn-sm" type="button">✖ Откажи</button>
+          <button id="btnUnsavedSave" class="btn btn-sm btn-primary" type="button">💾 Сними и продолжи</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ДИЈАЛОГ ЗА ОФСЕТИ ПРИ ОТВОРАЊЕ .CSV ПРОЕКТ -->
+  <div id="csvOffsetsModal" class="modal-overlay" style="display:none;z-index:1120;">
+    <div class="modal-dialog csv-offsets-dialog">
+      <div class="modal-header csv-offsets-header">
+        <div class="unsaved-header-title">
+          <span class="unsaved-icon">🎛️</span>
+          <h3 style="margin:0;font-size:14px;color:#1e3a8a;">Офсети на машина во отворениот .CSV проект</h3>
+        </div>
+        <button id="btnCloseCsvOffsetsModal" class="btn btn-xs btn-danger" type="button">✖</button>
+      </div>
+      <div class="modal-body csv-offsets-body">
+        <p id="csvOffsetsMessage" style="margin:0 0 8px 0;"></p>
+        <div id="csvOffsetsComparison" class="csv-offsets-comparison"></div>
+      </div>
+      <div class="modal-footer unsaved-footer">
+        <button id="btnCsvUseFile" class="btn btn-sm btn-warning" type="button" style="font-weight:600;">📥 Преземи офсети од фајлот</button>
+        <button id="btnCsvKeepCurrent" class="btn btn-sm btn-primary" type="button" style="font-weight:700;">✔ Задржи ги тековните офсети на машината</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- МОДАЛ ЗА ПРЕГЛЕД НА G-КОД (.TAP) ПРЕД ЕКСПОРТ / СТАРТУВАЊЕ -->
+  <div id="gcodePreviewModal" class="modal-overlay" style="display:none; z-index:1050;">
+    <div class="modal-dialog" style="width: 780px; max-width: 95vw; max-height: 92vh;">
+      <div class="modal-header" style="background:#f8fafc; border-bottom:1px solid #e2e8f0;">
+        <div class="gcode-preview-head">
+          <span style="font-size:18px;margin-right:8px;">⚡</span>
+          <div>
+            <h3 style="margin:0; font-size:14px; color:#0f172a;">Преглед на G-Код (.tap)</h3>
+            <span id="gcodePreviewSubTitle" style="font-size:11px; color:#64748b;">Генериран код за активниот таб</span>
+          </div>
+        </div>
+        <button id="btnCloseGcodePreview" class="btn btn-xs btn-danger" type="button">✖</button>
+      </div>
+
+      <div class="modal-body gcode-preview-body">
+        <div class="gcode-stat-bar">
+          <div class="gcode-stat-left">
+            <span>Линии: <strong id="gcodeStatLines" style="color:#0f172a;">0</strong></span>
+            <span>Време: <strong id="gcodeStatTime" style="color:#0f172a;">~0с</strong></span>
+            <span>Патека: <strong id="gcodeStatDist" style="color:#0f172a;">0mm</strong></span>
+          </div>
+          <div>
+            <span id="gcodeStatMode" style="display:inline-block; padding:2px 8px; border-radius:12px; font-size:10.5px; font-weight:600; background:#dbeafe; color:#1e40af; border:1px solid #93c5fd;">Режим: Унифициран (+ 0.001mm микро-чекор)</span>
+          </div>
+        </div>
+
+        <div style="position:relative; flex:1; min-height:280px; display:flex; flex-direction:column;">
+          <textarea id="gcodePreviewText" readonly spellcheck="false" style="width:100%; height:320px; font-family: 'Consolas', 'Courier New', monospace; font-size:11.5px; line-height:1.45; background:#0f172a; color:#38bdf8; padding:10px 12px; border-radius:6px; border:1px solid #334155; box-sizing:border-box; resize:vertical; outline:none; white-space:pre;"></textarea>
+        </div>
+      </div>
+
+      <div class="modal-footer" style="background:#f8fafc; border-top:1px solid #e2e8f0; padding:10px 14px;">
+        <button id="btnCancelGcodePreview" class="btn btn-sm">✖ Затвори</button>
+        <div class="gcode-footer-actions">
+          <button id="btnCopyGcodePreview" class="btn btn-sm" style="background:#f1f5f9; border-color:#cbd5e1; font-weight:600;">📋 Копирај сè</button>
+          <button id="btnSaveGcodeFromPreview" class="btn btn-sm btn-success" style="font-weight:700;">💾 Сними .TAP датотека</button>
+          <button id="btnRunFromGcodePreview" class="btn btn-sm btn-primary" style="font-weight:700;">▶ Пушти директно во Mach3</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/state.js"></script>
+  <script src="js/tabs.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/parser.js"></script>
+  <script src="js/driver-simulator.js"></script>
+  <script src="js/driver-mach3.js"></script>
+  <script src="js/machine-driver.js"></script>
+  <script src="js/canvas.js"></script>
+  <script src="js/table.js"></script>
+  <script src="js/gcode.js"></script>
+  <script src="js/svg-generator.js"></script>
+  <script src="js/calibration.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
